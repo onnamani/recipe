@@ -1,6 +1,7 @@
 package ng.com.smartcity.recipeApp.domain;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class Recipe {
@@ -16,6 +17,9 @@ public class Recipe {
     private String url;
     private String directions;
 //    private Difficulty difficulty;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe", fetch = FetchType.LAZY)
+    private Set<Ingredient> ingredients;
 
     @Lob
     private Byte[] image;
