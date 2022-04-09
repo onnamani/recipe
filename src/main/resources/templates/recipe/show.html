@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}">
+
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous" th:src="@{/webjars/bootstrap/3.3.7-1/js/bootstrap.min.js}"></script>
+    <title>Show Recipe</title>
+  </head>
+  <body>
+    <div class="container-fluid" style="margin-top: 20px">
+      <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+          <div class="panel-group">
+            <div class="panel panel-primary">
+              <div class="panel-heading">
+                <h2 class="panel-title" th:text="${recipe.description}">Recipe Description here</h2>
+              </div>
+              <div class="panel-body">
+                <div class="row">
+                  <div class="col-md-3">
+                    <h5>Category:</h5>
+                  </div>
+                  <div class="col-md-9">
+                    <ul>
+                      <li>cat one</li>
+                      <li>cat two</li>
+                      <li>cat three</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    <h5>Prep time:</h5>
+                  </div>
+                  <div class="col-md-3">
+                    <p style="margin-top: 6px">30 min</p>
+                  </div>
+                  <div class="col-md-3">
+                    <h5>Difficulty:</h5>
+                  </div>
+                  <div class="col-md-3">
+                    <p style="margin-top: 6px">Easy</p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    <h5>Cooktime:</h5>
+                  </div>
+                  <div class="col-md-3">
+                    <p style="margin-top: 6px">30 min</p>
+                  </div>
+                  <div class="col-md-3">
+                    <h5>Servings:</h5>
+                  </div>
+                  <div class="col-md-3">
+                    <p style="margin-top: 6px">4</p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    <h5>Source:</h5>
+                  </div>
+                  <div class="col-md-3">
+                    <p style="margin-top: 6px">30 min</p>
+                  </div>
+                  <div class="col-md-3">
+                    <h5>URL :</h5>
+                  </div>
+                  <div class="col-md-3">
+                    <p style="margin-top: 6px">www.example.com</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-primary">
+              <div class="panel-heading">
+                <h2 class="panel-title">Ingredients</h2>
+              </div>
+              <div class="panel-body">
+                <div class="row">
+                  <div class="col-md-12">
+                    <ul>
+                      <li>1 Cup of milk</li>
+                      <li>1 Teaspoon of chocolate</li>
+                      <li>1 Teaspoon of sugar</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-primary">
+              <div class="panel-heading">
+                <h2 class="panel-title">Directions</h2>
+              </div>
+              <div class="panel-body">
+                <div class="row">
+                  <div class="col-md-12">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                      Donec metus erat, porta feugiat mollis nec, molestie a risus. Nulla facilisi.
+                      Morbi id purus ut felis commodo fringilla. Fusce tempor mi enim, ullamcorper auctor nisi dictum id.
+                      Maecenas tempus tortor id malesuada bibendum. Integer eget arcu leo.
+                      Morbi pharetra, velit congue condimentum consectetur, massa velit imperdiet elit,
+                      at sagittis elit massa a lectus. Aenean interdum suscipit felis,
+                      vitae ultrices tellus dignissim eu.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-primary">
+              <div class="panel-heading">
+                <h2 class="panel-title">Notes</h2>
+              </div>
+              <div class="panel-body">
+                <div class="row">
+                  <div class="col-md-12">
+                    <p>Ut vitae efficitur dolor, non mattis nulla. Nullam tristique feugiat aliquam.
+                      Vestibulum convallis dolor vitae urna malesuada suscipit. Aenean metus nisi, malesuada a eros ac,
+                      tristique rhoncus nulla. Duis vel fringilla nisi. Class aptent taciti sociosqu ad litora torquent
+                      per conubia nostra, per inceptos himenaeos. Pellentesque habitant morbi tristique senectus et
+                      netus et malesuada fames ac turpis egestas. Nullam egestas turpis nec venenatis vulputate.
+                      Phasellus interdum eros quis lectus dignissim accumsan. Donec molestie egestas mi scelerisque
+                      semper. Nam aliquet eros arcu, nec mollis nulla rhoncus sed. Sed non aliquam nisi, interdum congue
+                      nisi.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
