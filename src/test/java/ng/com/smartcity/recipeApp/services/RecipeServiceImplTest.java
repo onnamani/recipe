@@ -1,5 +1,7 @@
 package ng.com.smartcity.recipeApp.services;
 
+import ng.com.smartcity.recipeApp.converters.RecipeCommandToRecipe;
+import ng.com.smartcity.recipeApp.converters.RecipeToRecipeCommand;
 import ng.com.smartcity.recipeApp.domain.Recipe;
 import ng.com.smartcity.recipeApp.repositories.RecipeRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,11 +23,15 @@ public class RecipeServiceImplTest {
 
     @Mock
     RecipeRepository recipeRepository;
+    @Mock
+    RecipeCommandToRecipe commandConverter;
+    @Mock
+    RecipeToRecipeCommand recipeConverter;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        recipeService = new RecipeServiceImpl(recipeRepository);
+        recipeService = new RecipeServiceImpl(recipeRepository, commandConverter, recipeConverter);
     }
 
     @Test
