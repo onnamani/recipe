@@ -44,7 +44,7 @@ class IngredientToIngredientCommandTest {
         IngredientCommand command = converter.convert(ingredient);
 
         assertNotNull(command);
-        assertNotNull(command.getUnitOfMeasure());
+        assertNotNull(command.getUom());
         assertEquals(ID, command.getId());
     }
 }
