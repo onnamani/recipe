@@ -48,6 +48,7 @@
                                     <td th:text="${recipe.id}">345</td>
                                     <td th:text="${recipe.description}">Yummy!!!!!!!!</td>
                                     <td><a href="#" th:href="@{'/recipe/' + ${recipe.id} + '/show'}">View</a></td>
+                                    <td><a href="#" th:href="@{'/recipe/' + ${recipe.id} + '/update'}">Update</a></td>
                                 </tr>
                             </table>
                         </div>
