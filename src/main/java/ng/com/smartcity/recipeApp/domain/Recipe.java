@@ -1,6 +1,8 @@
 package ng.com.smartcity.recipeApp.domain;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import ng.com.smartcity.recipeApp.domain.constants.Difficulty;
 
 import javax.persistence.*;
@@ -27,6 +29,7 @@ public class Recipe {
     private Difficulty difficulty;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe", fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Set<Ingredient> ingredients = new HashSet<>();
 
     @Lob
