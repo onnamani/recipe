@@ -1,11 +1,16 @@
 package ng.com.smartcity.recipeApp.services;
 
 import ng.com.smartcity.recipeApp.commands.IngredientCommand;
+import ng.com.smartcity.recipeApp.commands.UnitOfMeasureCommand;
+import ng.com.smartcity.recipeApp.converters.IngredientCommandToIngredient;
 import ng.com.smartcity.recipeApp.converters.IngredientToIngredientCommand;
+import ng.com.smartcity.recipeApp.converters.UnitOfMeasureCommandToUnitOfMeasure;
 import ng.com.smartcity.recipeApp.converters.UnitOfMeasureToUnitOfMeasureCommand;
 import ng.com.smartcity.recipeApp.domain.Ingredient;
 import ng.com.smartcity.recipeApp.domain.Recipe;
+import ng.com.smartcity.recipeApp.domain.UnitOfMeasure;
 import ng.com.smartcity.recipeApp.repositories.RecipeRepository;
+import ng.com.smartcity.recipeApp.repositories.UnitOfMeasureRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -21,6 +26,8 @@ class IngredientServiceImplTest {
 
     @Mock
     RecipeRepository recipeRepository;
+    @Mock
+    UnitOfMeasureRepository uomRepository;
 
     IngredientServiceImpl ingredientService;
 
@@ -28,8 +35,13 @@ class IngredientServiceImplTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         UnitOfMeasureToUnitOfMeasureCommand uomConverter = new UnitOfMeasureToUnitOfMeasureCommand();
+        UnitOfMeasureCommandToUnitOfMeasure uomCommandConverter = new UnitOfMeasureCommandToUnitOfMeasure();
         IngredientToIngredientCommand ingredientConverter = new IngredientToIngredientCommand(uomConverter);
-        ingredientService = new IngredientServiceImpl(recipeRepository, ingredientConverter);
+        IngredientCommandToIngredient ingredientCommandConverter = new IngredientCommandToIngredient(uomCommandConverter);
+        ingredientService = new IngredientServiceImpl(recipeRepository,
+                ingredientConverter,
+                ingredientCommandConverter,
+                uomRepository);
     }
 
     @Test
@@ -60,5 +72,53 @@ class IngredientServiceImplTest {
         assertEquals(ingredientService.findByRecipeIdAndIngredientId(1L, 3L).getId(), 3L);
         verify(recipeRepository, times(2)).findById(anyLong());
 
+    }
+
+    @Test
+    void saveIngredientCommandHappyPath() {
+        //given
+        Recipe recipe = new Recipe();
+        recipe.setId(1L);
+
+        IngredientCommand ingredientCommand = new IngredientCommand();
+        ingredientCommand.setId(2L);
+        ingredientCommand.setRecipeId(1L);
+
+        Ingredient ingredient = new Ingredient();
+        ingredient.setId(2L);
+        ingredient.setRecipe(recipe);
+        recipe.addIngredient(ingredient);
+
+        UnitOfMeasure unitOfMeasure = new UnitOfMeasure();
+        ingredient.setUom(unitOfMeasure);
+
+        UnitOfMeasureCommand uomCommand = new UnitOfMeasureCommand();
+        uomCommand.setId(3L);
+        ingredientCommand.setUom(uomCommand);
+
+        when(recipeRepository.findById(anyLong())).thenReturn(Optional.of(recipe));
+        when(uomRepository.findById(anyLong())).thenReturn(Optional.of(unitOfMeasure));
+        when(recipeRepository.save(any())).thenReturn(recipe);
+
+        //when
+        IngredientCommand savedIngredientCommand = ingredientService.saveIngredientCommand(ingredientCommand);
+
+        //then
+        assertEquals(savedIngredientCommand.getId(), ingredient.getId());
+        verify(recipeRepository, times(1)).findById(anyLong());
+        verify(recipeRepository, times(1)).save(any());
+        verify(recipeRepository, times(1)).findById(anyLong());
+
+    }
+
+    @Test
+    public void saveIngredientCommandWithNoRecipe() {
+        //given
+        IngredientCommand ingredientCommand = new IngredientCommand();
+
+        //then
+        assertThrows(RuntimeException.class, () -> {
+            ingredientService.saveIngredientCommand(ingredientCommand);
+        }, "recipe not found for this ingredient ID: " + ingredientCommand.getId());
     }
 }

@@ -2,15 +2,21 @@ package ng.com.smartcity.recipeApp.controllers;
 
 import ng.com.smartcity.recipeApp.commands.IngredientCommand;
 import ng.com.smartcity.recipeApp.commands.RecipeCommand;
+import ng.com.smartcity.recipeApp.commands.UnitOfMeasureCommand;
 import ng.com.smartcity.recipeApp.services.IngredientService;
 import ng.com.smartcity.recipeApp.services.RecipeService;
+import ng.com.smartcity.recipeApp.services.UnitOfMeasureService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -22,6 +28,8 @@ public class IngredientControllerTest {
     RecipeService recipeService;
     @Mock
     IngredientService ingredientService;
+    @Mock
+    UnitOfMeasureService uomService;
 
     IngredientController ingredientController;
     MockMvc mockMvc;
@@ -30,7 +38,7 @@ public class IngredientControllerTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        ingredientController = new IngredientController(recipeService, ingredientService);
+        ingredientController = new IngredientController(recipeService, ingredientService, uomService);
         mockMvc = MockMvcBuilders.standaloneSetup(ingredientController).build();
     }
 
@@ -62,5 +70,48 @@ public class IngredientControllerTest {
                 .andExpect(view().name("recipe/ingredient/show"))
                 .andExpect(model().attributeExists("ingredient"));
         verify(ingredientService, times(1)).findByRecipeIdAndIngredientId(anyLong(), anyLong());
+    }
+
+    @Test
+    public void updateRecipeIngredient() throws Exception {
+        //given
+        IngredientCommand ingredientCommand = new IngredientCommand();
+        ingredientCommand.setId(2L);
+        ingredientCommand.setRecipeId(1L);
+
+        Set<UnitOfMeasureCommand> uomSet = new HashSet<>();
+        UnitOfMeasureCommand uomCommand = new UnitOfMeasureCommand();
+        uomCommand.setId(1L);
+        uomSet.add(uomCommand);
+
+        //when
+        when(ingredientService.findByRecipeIdAndIngredientId(anyLong(), anyLong())).thenReturn(ingredientCommand);
+        when(uomService.listAllUoms()).thenReturn(uomSet);
+
+        //then
+        mockMvc.perform(MockMvcRequestBuilders.get("/recipe/1/ingredient/2/update"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("recipe/ingredient/ingredientform"))
+                .andExpect(model().attributeExists(new String[] {"ingredient", "uomList"}));
+    }
+
+    @Test
+    public void saveOrUpdate() throws Exception {
+        //given
+        IngredientCommand ingredientCommand = new IngredientCommand();
+        ingredientCommand.setId(1L);
+        ingredientCommand.setRecipeId(2L);
+
+        //when
+        when(ingredientService.saveIngredientCommand(any())).thenReturn(ingredientCommand);
+
+        //then
+        mockMvc.perform(MockMvcRequestBuilders.post("/recipe/2/ingredient")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("id", "")
+                .param("description", "some values")
+        )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/recipe/2/ingredient/1/show"));
     }
 }
