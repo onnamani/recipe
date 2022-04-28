@@ -8,7 +8,6 @@ import ng.com.smartcity.recipeApp.converters.UnitOfMeasureCommandToUnitOfMeasure
 import ng.com.smartcity.recipeApp.converters.UnitOfMeasureToUnitOfMeasureCommand;
 import ng.com.smartcity.recipeApp.domain.Ingredient;
 import ng.com.smartcity.recipeApp.domain.Recipe;
-import ng.com.smartcity.recipeApp.domain.UnitOfMeasure;
 import ng.com.smartcity.recipeApp.repositories.RecipeRepository;
 import ng.com.smartcity.recipeApp.repositories.UnitOfMeasureRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,14 +30,18 @@ class IngredientServiceImplTest {
     UnitOfMeasureRepository uomRepository;
 
     IngredientServiceImpl ingredientService;
+    IngredientCommandToIngredient ingredientCommandConverter;
+    IngredientToIngredientCommand ingredientConverter;
+    UnitOfMeasureCommandToUnitOfMeasure uomCommandConverter;
+    UnitOfMeasureToUnitOfMeasureCommand uomConverter;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        UnitOfMeasureToUnitOfMeasureCommand uomConverter = new UnitOfMeasureToUnitOfMeasureCommand();
-        UnitOfMeasureCommandToUnitOfMeasure uomCommandConverter = new UnitOfMeasureCommandToUnitOfMeasure();
-        IngredientToIngredientCommand ingredientConverter = new IngredientToIngredientCommand(uomConverter);
-        IngredientCommandToIngredient ingredientCommandConverter = new IngredientCommandToIngredient(uomCommandConverter);
+        uomConverter = new UnitOfMeasureToUnitOfMeasureCommand();
+        uomCommandConverter = new UnitOfMeasureCommandToUnitOfMeasure();
+        ingredientConverter = new IngredientToIngredientCommand(uomConverter);
+        ingredientCommandConverter = new IngredientCommandToIngredient(uomCommandConverter);
         ingredientService = new IngredientServiceImpl(recipeRepository,
                 ingredientConverter,
                 ingredientCommandConverter,
@@ -81,30 +85,57 @@ class IngredientServiceImplTest {
         recipe.setId(1L);
 
         IngredientCommand ingredientCommand = new IngredientCommand();
-        ingredientCommand.setId(2L);
         ingredientCommand.setRecipeId(1L);
-
-        Ingredient ingredient = new Ingredient();
-        ingredient.setId(2L);
-        ingredient.setRecipe(recipe);
-        recipe.addIngredient(ingredient);
-
-        UnitOfMeasure unitOfMeasure = new UnitOfMeasure();
-        ingredient.setUom(unitOfMeasure);
+        ingredientCommand.setAmount(new BigDecimal(20));
+        ingredientCommand.setDescription("new description");
 
         UnitOfMeasureCommand uomCommand = new UnitOfMeasureCommand();
         uomCommand.setId(3L);
         ingredientCommand.setUom(uomCommand);
 
         when(recipeRepository.findById(anyLong())).thenReturn(Optional.of(recipe));
-        when(uomRepository.findById(anyLong())).thenReturn(Optional.of(unitOfMeasure));
+        when(uomRepository.findById(anyLong())).thenReturn(Optional.of(uomCommandConverter.convert(uomCommand)));
         when(recipeRepository.save(any())).thenReturn(recipe);
 
         //when
-        IngredientCommand savedIngredientCommand = ingredientService.saveIngredientCommand(ingredientCommand);
+        IngredientCommand savedIngredientCommand = ingredientService.saveOrUpdateIngredientCommand(ingredientCommand);
 
         //then
-        assertEquals(savedIngredientCommand.getId(), ingredient.getId());
+        assertNotNull(savedIngredientCommand);
+        assertEquals(savedIngredientCommand.getRecipeId(), recipe.getId());
+        verify(recipeRepository, times(1)).findById(anyLong());
+        verify(recipeRepository, times(1)).save(any());
+        verify(recipeRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    void updateIngredientCommandHappyPath() {
+        //given
+        Recipe recipe = new Recipe();
+        recipe.setId(1L);
+
+        IngredientCommand ingredientCommand = new IngredientCommand();
+        ingredientCommand.setId(2L);
+        ingredientCommand.setRecipeId(1L);
+        ingredientCommand.setAmount(new BigDecimal(20));
+        ingredientCommand.setDescription("new description");
+
+
+        recipe.addIngredient(ingredientCommandConverter.convert(ingredientCommand));
+
+        UnitOfMeasureCommand uomCommand = new UnitOfMeasureCommand();
+        uomCommand.setId(3L);
+        ingredientCommand.setUom(uomCommand);
+
+        when(recipeRepository.findById(anyLong())).thenReturn(Optional.of(recipe));
+        when(uomRepository.findById(anyLong())).thenReturn(Optional.of(uomCommandConverter.convert(uomCommand)));
+        when(recipeRepository.save(any())).thenReturn(recipe);
+
+        //when
+        IngredientCommand savedIngredientCommand = ingredientService.saveOrUpdateIngredientCommand(ingredientCommand);
+
+        //then
+        assertEquals(savedIngredientCommand.getId(), 2L);
         verify(recipeRepository, times(1)).findById(anyLong());
         verify(recipeRepository, times(1)).save(any());
         verify(recipeRepository, times(1)).findById(anyLong());
@@ -118,7 +149,7 @@ class IngredientServiceImplTest {
 
         //then
         assertThrows(RuntimeException.class, () -> {
-            ingredientService.saveIngredientCommand(ingredientCommand);
+            ingredientService.saveOrUpdateIngredientCommand(ingredientCommand);
         }, "recipe not found for this ingredient ID: " + ingredientCommand.getId());
     }
 }

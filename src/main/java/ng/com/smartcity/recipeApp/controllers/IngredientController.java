@@ -2,6 +2,8 @@ package ng.com.smartcity.recipeApp.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import ng.com.smartcity.recipeApp.commands.IngredientCommand;
+import ng.com.smartcity.recipeApp.commands.RecipeCommand;
+import ng.com.smartcity.recipeApp.commands.UnitOfMeasureCommand;
 import ng.com.smartcity.recipeApp.services.IngredientService;
 import ng.com.smartcity.recipeApp.services.RecipeService;
 import ng.com.smartcity.recipeApp.services.UnitOfMeasureService;
@@ -33,6 +35,21 @@ public class IngredientController {
     }
 
     @GetMapping
+    @RequestMapping("/recipe/{recipeId}/ingredient/new")
+    public String newIngredient(@PathVariable String recipeId, Model model) {
+        RecipeCommand recipeCommand = recipeService.findCommandById(Long.valueOf(recipeId));
+
+        IngredientCommand ingredientCommand = new IngredientCommand();
+        ingredientCommand.setRecipeId(recipeCommand.getId());
+        ingredientCommand.setUom(new UnitOfMeasureCommand());
+
+        model.addAttribute("ingredient", ingredientCommand);
+        model.addAttribute("uomList", uomService.listAllUoms());
+
+        return "recipe/ingredient/ingredientform";
+    }
+
+    @GetMapping
     @RequestMapping("/recipe/{recipeId}/ingredient/{ingredientId}/show")
     public String getRecipeIngredient(@PathVariable String recipeId,
                                       @PathVariable String ingredientId,
@@ -58,7 +75,7 @@ public class IngredientController {
     @PostMapping
     @RequestMapping("/recipe/{recipeId}/ingredient")
     public String saveOrUpdate(@ModelAttribute IngredientCommand command) {
-        IngredientCommand savedCommand = ingredientService.saveIngredientCommand(command);
+        IngredientCommand savedCommand = ingredientService.saveOrUpdateIngredientCommand(command);
 
         log.debug("saved recipe ID: " + savedCommand.getRecipeId());
         log.debug("saved ingredient ID: " + savedCommand.getId());

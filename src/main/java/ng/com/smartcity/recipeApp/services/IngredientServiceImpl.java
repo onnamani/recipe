@@ -53,43 +53,52 @@ public class IngredientServiceImpl implements IngredientService {
 
     @Transactional
     @Override
-    public IngredientCommand saveIngredientCommand(IngredientCommand command) {
+    public IngredientCommand saveOrUpdateIngredientCommand(IngredientCommand command) {
         Optional<Recipe> recipeOptional = recipeRepository.findById(command.getRecipeId());
 
-        if(!recipeOptional.isPresent()) {
+        Recipe recipe = recipeOptional.orElseThrow(() -> {
             log.error("Recipe not found for ID: " + command.getRecipeId());
-            throw new RuntimeException("recipe not found for this ingredient ID: " + command.getId());
-        }
+            return new RuntimeException("recipe not found for this ingredient");
+        });
 
-        Recipe recipe = recipeOptional.get();
+        Ingredient saveOrUpdateIngredient;
 
-        Optional<Ingredient> ingredientOptional = recipe.getIngredients().stream()
-                .filter(ingredient -> ingredient.getId().equals(command.getId()))
-                .findFirst();
+        if(recipe.getIngredients().contains(command)) {
+            saveOrUpdateIngredient = recipe.getIngredients().stream()
+                    .filter(ingredient -> ingredient.getId().equals(command.getId()))
+                    .findFirst()
+                    .orElseThrow(() -> {
+                        log.error("ingredient for id: " + command.getId() + " not returned from recipe");
+                        return new RuntimeException("Something went wrong during update. Try again");
+                    });
 
-        if (ingredientOptional.isPresent()) {
-            Ingredient ingredientFound = ingredientOptional.get();
-            ingredientFound.setDescription(command.getDescription());
-            ingredientFound.setAmount(command.getAmount());
-            ingredientFound.setUom(
-                    uomRepository.findById(command.getUom().getId())
-                            .orElseThrow(() -> {
-                                log.error("uom ID not found: " + command.getUom().getId());
-                                return new RuntimeException("uom ID not found");
-                            }));
+            saveOrUpdateIngredient.setDescription(command.getDescription());
+            saveOrUpdateIngredient.setAmount(command.getAmount());
+            saveOrUpdateIngredient.setUom(uomRepository.findById(command.getUom().getId())
+                    .orElseThrow(() -> {
+                        log.error("uom for the ingredient could not be found");
+                        return new RuntimeException("Something went wrong while updating the unit of measure");
+                    })
+            );
         } else {
-            recipe.addIngredient(ingredientCommandConverter.convert(command));
+            saveOrUpdateIngredient = ingredientCommandConverter.convert(command);
         }
 
-        Recipe savedRecipe = recipeRepository.save(recipe);
+        recipe.addIngredient(saveOrUpdateIngredient);
 
-        IngredientCommand savedIngredientCommand = savedRecipe.getIngredients().stream()
-                .filter(ingredient -> ingredient.getId().equals(command.getId()))
+        Recipe returnedRecipe = recipeRepository.save(recipe);
+
+        IngredientCommand returnedIngredient = returnedRecipe.getIngredients().stream()
+                .filter(ingredient -> ingredient.getDescription().equals(command.getDescription())
+                                            && ingredient.getAmount().equals(command.getAmount()))
                 .map(ingredientConverter::convert)
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Something went wrong. Please try again"));
+                .orElseThrow(() -> {
+                    log.error("ingredient not returned from database recipe");
+                    return new RuntimeException("Something went wrong while saving ingredient. Try again");
+                });
 
-        return savedIngredientCommand;
+        return returnedIngredient;
 
     }
 
