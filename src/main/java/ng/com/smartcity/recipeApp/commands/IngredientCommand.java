@@ -1,5 +1,6 @@
 package ng.com.smartcity.recipeApp.commands;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,6 +9,7 @@ import java.math.BigDecimal;
 
 @Setter
 @Getter
+@EqualsAndHashCode(exclude = {"recipeId"})
 @NoArgsConstructor
 public class IngredientCommand {
 

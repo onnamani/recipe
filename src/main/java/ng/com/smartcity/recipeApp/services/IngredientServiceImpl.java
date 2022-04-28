@@ -63,7 +63,8 @@ public class IngredientServiceImpl implements IngredientService {
 
         Ingredient saveOrUpdateIngredient;
 
-        if(recipe.getIngredients().contains(command)) {
+        if(recipe.getIngredients().stream().
+                filter(ingredient -> ingredient.getId().equals(command.getId())).findFirst().isPresent()) {
             saveOrUpdateIngredient = recipe.getIngredients().stream()
                     .filter(ingredient -> ingredient.getId().equals(command.getId()))
                     .findFirst()
