@@ -91,7 +91,8 @@ public class IngredientServiceImpl implements IngredientService {
 
         IngredientCommand returnedIngredient = returnedRecipe.getIngredients().stream()
                 .filter(ingredient -> ingredient.getDescription().equals(command.getDescription())
-                                            && ingredient.getAmount().equals(command.getAmount()))
+                                            && ingredient.getAmount().equals(command.getAmount())
+                                            && ingredient.getUom().getId().equals(command.getUom().getId()))
                 .map(ingredientConverter::convert)
                 .findFirst()
                 .orElseThrow(() -> {

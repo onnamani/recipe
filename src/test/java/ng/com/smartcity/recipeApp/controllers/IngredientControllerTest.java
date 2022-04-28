@@ -83,7 +83,7 @@ public class IngredientControllerTest {
         when(uomService.listAllUoms()).thenReturn(new HashSet<UnitOfMeasureCommand>());
 
         //then
-        mockMvc.perform(MockMvcRequestBuilders.get("/recipe/1/ingredient/show"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/recipe/1/ingredient/new"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("recipe/ingredient/ingredientform"))
                 .andExpect(model().attributeExists(new String[]{"ingredient", "uomList"}));
