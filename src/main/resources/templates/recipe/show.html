@@ -22,20 +22,34 @@
           <div class="panel-group">
             <div class="panel panel-primary">
               <div class="panel-heading">
-                <!--/*@thymesVar id="recipe" type="ng.com.smartcity.recipeApp.domain.Recipe"*/-->
-                <h2 class="panel-title" th:text="${recipe.description}">Recipe Description here</h2>
+                <div class="row">
+                  <div class="col-md-3">
+                    <!--/*@thymesVar id="recipe" type="ng.com.smartcity.recipeApp.domain.Recipe"*/-->
+                    <h2 class="panel-title" th:text="${recipe.description}">Recipe Description here</h2>
+                  </div>
+                  <div class="col-md-1">
+                    <a class="btn btn-default" href="#"
+                    th:href="@{'/recipe/' + ${recipe.id} + '/image'}" role="button">Change Image</a>
+                  </div>
+                </div>
+
               </div>
               <div class="panel-body">
                 <div class="row">
                   <div class="col-md-3">
                     <h5>Category:</h5>
                   </div>
-                  <div class="col-md-9">
+                  <div class="col-md-3">
                     <ul th:each="category : ${recipe.categories}">
                       <li th:remove="all">cat one</li>
                       <li th:remove="all">cat two</li>
                       <li th:text="${category.description}">cat three</li>
                     </ul>
+                  </div>
+                  <div class="col-md-6">
+                    <img src="../../static/images/imageplaceholder.jpeg"
+                          th:src="@{/images/imageplaceholder.jpeg}"
+                          width="200" height="200"/>
                   </div>
                 </div>
                 <div class="row">
