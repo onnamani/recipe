@@ -47,6 +47,8 @@ public class RecipeToRecipeCommand implements Converter<Recipe, RecipeCommand> {
                 .map(categoryConverter::convert)
                 .collect(Collectors.toSet())
         );
+        command.setImage(recipeSource.getImage());
+
         return command;
     }
 }
