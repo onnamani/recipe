@@ -43,7 +43,7 @@ public class RecipeServiceImpl implements RecipeService {
     public Recipe findById(Long id) {
         Optional<Recipe> recipeOptional = recipeRepository.findById(id);
 
-        return recipeOptional.orElseThrow(() -> new NotFoundException("Recipe Not Found"));
+        return recipeOptional.orElseThrow(() -> new NotFoundException("Recipe Not Found for ID: " + id));
     }
 
     @Transactional
