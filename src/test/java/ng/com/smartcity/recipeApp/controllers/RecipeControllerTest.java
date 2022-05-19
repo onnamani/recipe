@@ -58,6 +58,14 @@ class RecipeControllerTest {
     }
 
     @Test
+    public void getRecipeNumberFormatException() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/recipe/abc/show"))
+                .andExpect(status().isBadRequest())
+                .andExpect(model().attributeExists("exception"))
+                .andExpect(view().name("400error"));
+    }
+
+    @Test
     public void deleteById() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/recipe/1/delete"))
                 .andExpect(status().is3xxRedirection())
