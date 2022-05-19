@@ -2,10 +2,13 @@ package ng.com.smartcity.recipeApp.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import ng.com.smartcity.recipeApp.commands.RecipeCommand;
+import ng.com.smartcity.recipeApp.exceptions.NotFoundException;
 import ng.com.smartcity.recipeApp.services.RecipeService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 @Slf4j
 @Controller
@@ -50,5 +53,16 @@ public class RecipeController {
         RecipeCommand savedCommand = recipeService.saveRecipeCommand(command);
 
         return "redirect:/recipe/" + savedCommand.getId() + "/show";
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundException.class)
+    public ModelAndView handleNotFound() {
+        log.error("Handling not found exception error");
+
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("404error");
+
+        return modelAndView;
     }
 }
