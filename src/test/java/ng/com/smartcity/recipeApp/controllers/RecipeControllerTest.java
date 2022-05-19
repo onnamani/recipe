@@ -2,6 +2,7 @@ package ng.com.smartcity.recipeApp.controllers;
 
 import ng.com.smartcity.recipeApp.commands.RecipeCommand;
 import ng.com.smartcity.recipeApp.domain.Recipe;
+import ng.com.smartcity.recipeApp.exceptions.NotFoundException;
 import ng.com.smartcity.recipeApp.services.RecipeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,14 @@ class RecipeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("recipe/show"))
                 .andExpect(model().attributeExists("recipe"));
+    }
+
+    @Test
+    public void getRecipeByIdNotFound() throws Exception {
+        when(recipeService.findById(anyLong())).thenThrow(NotFoundException.class);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/recipe/1/show"))
+                .andExpect(status().isNotFound());
     }
 
     @Test

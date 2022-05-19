@@ -5,6 +5,7 @@ import ng.com.smartcity.recipeApp.commands.RecipeCommand;
 import ng.com.smartcity.recipeApp.converters.RecipeCommandToRecipe;
 import ng.com.smartcity.recipeApp.converters.RecipeToRecipeCommand;
 import ng.com.smartcity.recipeApp.domain.Recipe;
+import ng.com.smartcity.recipeApp.exceptions.NotFoundException;
 import ng.com.smartcity.recipeApp.repositories.RecipeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +43,7 @@ public class RecipeServiceImpl implements RecipeService {
     public Recipe findById(Long id) {
         Optional<Recipe> recipeOptional = recipeRepository.findById(id);
 
-        return recipeOptional.orElseThrow(() -> new RuntimeException("Recipe not found"));
+        return recipeOptional.orElseThrow(() -> new NotFoundException("Recipe Not Found"));
     }
 
     @Transactional

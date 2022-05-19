@@ -3,6 +3,7 @@ package ng.com.smartcity.recipeApp.services;
 import ng.com.smartcity.recipeApp.converters.RecipeCommandToRecipe;
 import ng.com.smartcity.recipeApp.converters.RecipeToRecipeCommand;
 import ng.com.smartcity.recipeApp.domain.Recipe;
+import ng.com.smartcity.recipeApp.exceptions.NotFoundException;
 import ng.com.smartcity.recipeApp.repositories.RecipeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,8 +14,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class RecipeServiceImplTest {
@@ -47,6 +47,17 @@ public class RecipeServiceImplTest {
         assertNotNull(returnedRecipe);
         verify(recipeRepository, times(1)).findById(anyLong());
         verify(recipeRepository, never()).findAll();
+    }
+
+    @Test
+    public void getRecipeByIdNotFound() {
+        Optional<Recipe> recipeOptional = Optional.empty();
+
+        when(recipeRepository.findById(anyLong())).thenReturn(recipeOptional);
+
+        NotFoundException notFoundException = assertThrows(NotFoundException.class,
+                                                () -> recipeService.findById(1L),
+                                        "Expected exception to throw an error. But it didn't");
     }
 
     @Test
