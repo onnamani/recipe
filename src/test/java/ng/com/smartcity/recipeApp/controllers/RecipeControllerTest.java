@@ -109,7 +109,9 @@ class RecipeControllerTest {
 
         when(recipeService.saveRecipeCommand(any(RecipeCommand.class))).thenReturn(command);
 
-        mockMvc.perform((MockMvcRequestBuilders.post("/recipe")))
+        mockMvc.perform((MockMvcRequestBuilders.post("/recipe"))
+                        .param("cookTime", "9000")
+                        .param("servings", "0"))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("recipe"))
                 .andExpect(view().name("recipe/recipeform"));

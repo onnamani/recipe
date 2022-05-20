@@ -111,7 +111,7 @@
                     <input type="text" class="form-control" th:field="*{servings}" th:errorclass="has-error"/>
                     <span class="help-block" th:if="${#fields.hasErrors('servings')}">
                       <ul>
-                        <li th:each="err : ${#fields.errors('servings')}" th:text${err}></li>
+                        <li th:each="err : ${#fields.errors('servings')}" th:text="${err}"></li>
                       </ul>
                     </span>
                   </div>
